@@ -10,14 +10,16 @@ import Foundation
 
 public struct FuseProperty {
     let name: String
+    let value: String
     let weight: Double
     
-    public init (name: String) {
-        self.init(name: name, weight: 1)
+    public init (name: String, value: String) {
+        self.init(name: name, value: value, weight: 1)
     }
     
-    public init (name: String, weight: Double) {
+    public init (name: String, value: String, weight: Double) {
         self.name = name
+        self.value = value
         self.weight = weight
     }
 }
@@ -43,6 +45,7 @@ public class Fuse {
         score: Double,
         results: [(
             key: String,
+            value: String,
             score: Double,
             ranges: [CountableClosedRange<Int>]
         )]
@@ -402,8 +405,8 @@ extension Fuse {
     ///
     ///         var properties: [FuseProperty] {
     ///             return [
-    ///                 FuseProperty(name: title, weight: 0.3),
-    ///                 FuseProperty(name: author, weight: 0.7),
+    ///                 FuseProperty(name: "title", value: title, weight: 0.3),
+    ///                 FuseProperty(name: "author", value: author, weight: 0.7),
     ///             ]
     ///         }
     ///     }
@@ -431,10 +434,10 @@ extension Fuse {
             var scores = [Double]()
             var totalScore = 0.0
             
-            var propertyResults = [(key: String, score: Double, ranges: [CountableClosedRange<Int>])]()
+            var propertyResults = [(key: String, value: String, score: Double, ranges: [CountableClosedRange<Int>])]()
 
             item.properties.forEach { property in
-                let value = property.name
+                let value = property.value
                 
                 if let result = self.search(pattern, in: value) {
                     let weight = property.weight == 1 ? 1 : 1 - property.weight
@@ -443,7 +446,7 @@ extension Fuse {
                     
                     scores.append(score)
                     
-                    propertyResults.append((key: property.name, score: score, ranges: result.ranges))
+                    propertyResults.append((key: property.name, value: property.value, score: score, ranges: result.ranges))
                 }
             }
             
@@ -476,8 +479,8 @@ extension Fuse {
     ///
     ///         var properties: [FuseProperty] {
     ///             return [
-    ///                 FuseProperty(name: title, weight: 0.3),
-    ///                 FuseProperty(name: author, weight: 0.7),
+    ///                 FuseProperty(name: "title", value: title, weight: 0.3),
+    ///                 FuseProperty(name: "author", value: author, weight: 0.7),
     ///             ]
     ///         }
     ///     }
@@ -522,11 +525,11 @@ extension Fuse {
                     var scores = [Double]()
                     var totalScore = 0.0
                     
-                    var propertyResults = [(key: String, score: Double, ranges: [CountableClosedRange<Int>])]()
+                    var propertyResults = [(key: String, value: String, score: Double, ranges: [CountableClosedRange<Int>])]()
 
                     item.properties.forEach { property in
 
-                        let value = property.name
+                        let value = property.value
                         
                         if let result = self.search(pattern, in: value) {
                             let weight = property.weight == 1 ? 1 : 1 - property.weight
@@ -535,7 +538,7 @@ extension Fuse {
                             
                             scores.append(score)
                             
-                            propertyResults.append((key: property.name, score: score, ranges: result.ranges))
+                            propertyResults.append((key: property.name, value: property.value, score: score, ranges: result.ranges))
                         }
                     }
                     
